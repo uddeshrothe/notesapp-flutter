@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notesapp/data/database.dart';
 import 'package:notesapp/utilities/dialog_box.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../utilities/todo_tile.dart';
 
@@ -17,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   final _myBox = Hive.box('myBox');
   toDoDatabase db = toDoDatabase();
 
+  late FToast fToast;
   @override
   void initState() {
     // For first time opening the app, then load default data
@@ -25,6 +29,9 @@ class _HomePageState extends State<HomePage> {
     } else {
       db.loadData();
     }
+
+    fToast = FToast();
+    fToast.init(context);
 
     super.initState();
   }
@@ -39,10 +46,26 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
+  Widget toast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.lime[100],
+    ),
+    child: Text("Task name is missing!"),
+  );
+
   //Save task
   void saveNewTask() {
     setState(() {
-      db.toDoList.add([_controller.text, false]);
+      if (_controller.text.isNotEmpty) {
+        db.toDoList.add([_controller.text, false]);
+      } else {
+        fToast.showToast(
+          child: toast,
+        );
+        _controller.clear();
+      }
       _controller.clear();
     });
     Navigator.of(context).pop();
@@ -73,27 +96,91 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[200],
+      backgroundColor: Colors.lime[50],
+      drawer: Drawer(
+        backgroundColor: Colors.lime[50],
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    opacity: .8,
+                    image: AssetImage('lib/icons/taskit2.png'),
+                  ),
+                ),
+                child: const Text(
+                  '',
+                  style: TextStyle(color: Colors.lime),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              iconColor: Colors.black,
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const HomePage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              iconColor: Colors.black,
+              onTap: () {
+                showAboutDialog(
+                    context: context,
+                    applicationName: 'Task it',
+                    applicationIcon: Image.asset('lib/icons/taskit3.png'),
+                    applicationVersion: '1.0',
+                    applicationLegalese: 'Keep track of tasks');
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
-        title: const Text('TO DO'),
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.lime,
+        title: const Text(
+          'TASK IT',
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 30,
+              fontFamily: 'SourceCodePro',
+              fontWeight: FontWeight.w900),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.lime,
+        foregroundColor: Colors.black,
         onPressed: createNewTask,
         child: const Icon(Icons.add),
       ),
-      body: ListView.builder(
-        itemCount: db.toDoList.length,
-        itemBuilder: (context, index) {
-          return ToDoTile(
-            taskName: db.toDoList[index][0],
-            taskCompleted: db.toDoList[index][1],
-            onChanged: (value) => checkBoxChanged(value, index),
-            deleteFunction: (context) => deleteTask(index),
-          );
-        },
-      ),
+      body: db.toDoList.isEmpty
+          ? Scaffold(
+              backgroundColor: Colors.lime[50],
+              body: const Center(
+                child: Text(
+                  "Add tasks!!",
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w100),
+                ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: db.toDoList.length,
+              itemBuilder: (context, index) {
+                return ToDoTile(
+                  taskName: db.toDoList[index][0],
+                  taskCompleted: db.toDoList[index][1],
+                  onChanged: (value) => checkBoxChanged(value, index),
+                  deleteFunction: (context) => deleteTask(index),
+                );
+              },
+            ),
     );
   }
 }
