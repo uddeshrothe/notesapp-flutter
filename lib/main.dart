@@ -10,19 +10,21 @@ void main() async {
   //Open a box
   var box = await Hive.openBox('mybox');
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  final ThemeMode _themeMode = ThemeMode.system;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
-      theme: ThemeData(primarySwatch: Colors.amber),
+      theme: ThemeData(),
+      // darkTheme: ThemeData.dark(),
+      themeMode: _themeMode,
     );
   }
 }

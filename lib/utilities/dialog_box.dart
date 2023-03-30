@@ -14,7 +14,7 @@ class DialogBox extends StatelessWidget {
       title: const Center(child: Text('Add new task')),
       shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
-      backgroundColor: Colors.yellow,
+      backgroundColor: Colors.white,
       content: SizedBox(
         height: 200,
         width: 120,
@@ -24,13 +24,18 @@ class DialogBox extends StatelessWidget {
             TextField(
               controller: controller,
               maxLength: 60,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.lime),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  fillColor: Colors.lime,
                   border: OutlineInputBorder(), hintText: 'Input your task'),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                MyButton(text: 'Save', onPressed: onSave),
+                MyButton(text: 'Save', onPressed: onSave,),
                 const SizedBox(
                   width: 8,
                 ),
