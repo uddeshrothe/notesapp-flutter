@@ -120,8 +120,7 @@ class _HomePageState extends State<HomePage> {
               title: const Text('Home'),
               iconColor: Colors.black,
               onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const HomePage()));
+                Navigator.pop(context);
               },
             ),
             ListTile(
